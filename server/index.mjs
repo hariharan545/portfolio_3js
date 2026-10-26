@@ -37,7 +37,11 @@ async function connectDb() {
 }
 
 // ---------- email ----------
+// Hosts such as Render's free plan block SMTP ports (465/587). An HTTPS email API (Resend) works everywhere.
+const resendKey = env.RESEND_API_KEY
+
 function makeTransport() {
+  if (resendKey) return null // the API is used instead of SMTP
   if (env.SMTP_HOST && env.SMTP_USER && env.SMTP_PASS) {
     return nodemailer.createTransport({
       host: env.SMTP_HOST,
@@ -56,7 +60,19 @@ function makeTransport() {
 const transport = makeTransport()
 // in dev mode (no SMTP) a placeholder address lets the flow be tested end to end
 const mailTo = env.MAIL_TO || env.SMTP_USER || (isProd ? undefined : 'dev@localhost')
-const mailFrom = env.MAIL_FROM || env.SMTP_USER || 'portfolio@localhost'
+// Resend's shared sender only delivers to the email you signed up with, which is exactly one inbox: yours
+const mailFrom = env.MAIL_FROM || env.SMTP_USER || (resendKey ? 'Portfolio <onboarding@resend.dev>' : 'portfolio@localhost')
+const canEmail = Boolean(mailTo && (resendKey || transport))
+
+async function sendViaResend({ subject, text, html, replyTo }) {
+  const res = await fetch(env.RESEND_API_URL || 'https://api.resend.com/emails', {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${resendKey}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ from: mailFrom, to: [mailTo], subject, text, html, reply_to: replyTo }),
+    signal: AbortSignal.timeout(10000),
+  })
+  if (!res.ok) throw new Error(`Resend responded with HTTP ${res.status}`)
+}
 
 const escapeHtml = (s) =>
   s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c])
@@ -99,7 +115,7 @@ app.use((req, res, next) => {
 app.use(express.json({ limit: '10kb' }))
 
 app.get('/api/health', (_req, res) => {
-  res.json({ ok: true, db: dbStatus, mail: transport ? (env.SMTP_HOST ? 'smtp' : 'dev-only') : 'off' })
+  res.json({ ok: true, db: dbStatus, mail: resendKey ? 'resend' : transport ? (env.SMTP_HOST ? 'smtp' : 'dev-only') : 'off' })
 })
 
 const limiter = rateLimit({
@@ -117,7 +133,7 @@ app.post('/api/contact', limiter, async (req, res) => {
   const { name, email, message, errors } = validate(req.body)
   if (Object.keys(errors).length) return res.status(400).json({ ok: false, errors })
 
-  if (!collection && !(transport && mailTo)) {
+  if (!collection && !canEmail) {
     return res.status(503).json({ ok: false, error: 'The contact service is not set up yet. Please email me directly.' })
   }
 
@@ -143,18 +159,25 @@ app.post('/api/contact', limiter, async (req, res) => {
   }
 
   let emailed = false
-  if (transport && mailTo) {
+  if (canEmail) {
     try {
-      const info = await transport.sendMail({
-        from: mailFrom,
-        to: mailTo,
-        replyTo: { name: name.replace(/["<>]/g, ''), address: email },
-        subject: `Portfolio message from ${name}`.slice(0, 150),
-        text: `${message}\n\n-- \n${name} <${email}>`,
-        html: `<p style="white-space:pre-wrap">${escapeHtml(message)}</p><hr><p><b>${escapeHtml(name)}</b> &lt;${escapeHtml(email)}&gt;</p>`,
-      })
+      const subject = `Portfolio message from ${name}`.slice(0, 150)
+      const text = `${message}\n\n-- \n${name} <${email}>`
+      const html = `<p style="white-space:pre-wrap">${escapeHtml(message)}</p><hr><p><b>${escapeHtml(name)}</b> &lt;${escapeHtml(email)}&gt;</p>`
+      if (resendKey) {
+        await sendViaResend({ subject, text, html, replyTo: email })
+      } else {
+        const info = await transport.sendMail({
+          from: mailFrom,
+          to: mailTo,
+          replyTo: { name: name.replace(/["<>]/g, ''), address: email },
+          subject,
+          text,
+          html,
+        })
+        if (!env.SMTP_HOST) console.log('[mail] dev message:', info.message?.toString().slice(0, 400))
+      }
       emailed = true
-      if (!env.SMTP_HOST) console.log('[mail] dev message:', info.message?.toString().slice(0, 400))
     } catch (err) {
       console.error('[mail] send failed:', err instanceof Error ? err.message : 'unknown error')
     }
