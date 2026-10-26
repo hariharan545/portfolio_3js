@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="760" viewBox="0 0 600 760" role="img" aria-label="Cartoon developer character">
+  <!-- back hair: a tousled mass of curls -->
+  <g fill="#1a1210">
+    <ellipse cx="300" cy="255" rx="150" ry="115"/>
+    <circle cx="300" cy="170" r="62"/><circle cx="238" cy="182" r="54"/><circle cx="362" cy="182" r="54"/>
+    <circle cx="188" cy="228" r="48"/><circle cx="412" cy="228" r="48"/>
+    <circle cx="165" cy="290" r="38"/><circle cx="435" cy="290" r="38"/>
+    <circle cx="268" cy="150" r="40"/><circle cx="335" cy="148" r="42"/>
+  </g>
+  <!-- sweatshirt -->
+  <path d="M20 760 C20 625 120 565 232 545 L368 545 C480 565 580 625 580 760 Z" fill="#d92b21"/>
+  <path d="M232 545 C150 570 90 620 70 700 C110 640 170 600 240 585 Z" fill="#b01f18"/>
+  <path d="M368 545 C450 570 510 620 530 700 C490 640 430 600 360 585 Z" fill="#b01f18"/>
+  <!-- neck + collar -->
+  <path d="M252 455 h96 v92 q-48 44 -96 0 z" fill="#b9774f"/>
+  <path d="M236 540 Q300 612 364 540 L350 518 Q300 575 250 518 Z" fill="#8f160f"/>
+  <!-- ears -->
+  <ellipse cx="177" cy="385" rx="22" ry="35" fill="#cf8a5e"/>
+  <ellipse cx="423" cy="385" rx="22" ry="35" fill="#cf8a5e"/>
+  <!-- head -->
+  <ellipse cx="300" cy="372" rx="125" ry="150" fill="#e2a576"/>
+  <!-- front hair / fringe -->
+  <path d="M176 318 C190 238 256 214 300 220 C350 214 412 238 424 318 C396 272 352 258 300 262 C248 258 204 272 176 318 Z" fill="#1a1210"/>
+  <!-- brows -->
+  <path d="M212 322 Q245 304 280 320" stroke="#1a1210" stroke-width="10" fill="none" stroke-linecap="round"/>
+  <path d="M320 320 Q355 304 388 322" stroke="#1a1210" stroke-width="10" fill="none" stroke-linecap="round"/>
+  <!-- eyes -->
+  <circle cx="246" cy="366" r="10" fill="#1a1210"/><circle cx="250" cy="362" r="3" fill="#fff"/>
+  <circle cx="354" cy="366" r="10" fill="#1a1210"/><circle cx="358" cy="362" r="3" fill="#fff"/>
+  <!-- glasses -->
+  <g stroke="#14100e" stroke-width="8" fill="rgba(255,255,255,0.16)">
+    <rect x="203" y="334" width="86" height="62" rx="24"/>
+    <rect x="311" y="334" width="86" height="62" rx="24"/>
+  </g>
+  <path d="M289 358 Q300 350 311 358" stroke="#14100e" stroke-width="8" fill="none" stroke-linecap="round"/>
+  <path d="M203 352 L180 346 M397 352 L420 346" stroke="#14100e" stroke-width="8" stroke-linecap="round"/>
+  <!-- nose -->
+  <path d="M300 380 q-14 38 -2 50 q14 4 22 -8" stroke="#b9774f" stroke-width="7" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- beard and moustache -->
+  <path d="M178 395 C182 488 236 532 300 532 C364 532 418 488 422 395 C404 436 372 448 342 446 C322 438 278 438 258 446 C228 448 196 436 178 395 Z" fill="#1a1210"/>
+  <path d="M252 444 Q300 422 348 444 Q300 462 252 444 Z" fill="#1a1210"/>
+  <path d="M268 478 Q300 498 332 478" stroke="#f3d6c2" stroke-width="8" fill="none" stroke-linecap="round"/>
+  <!-- red rim light on the right edge -->
+  <path d="M418 300 C438 360 430 430 396 490" stroke="#ff5a4f" stroke-width="9" fill="none" stroke-linecap="round" opacity="0.75"/>
+  <path d="M520 640 C540 670 552 710 556 760" stroke="#ff5a4f" stroke-width="9" fill="none" stroke-linecap="round" opacity="0.6"/>
+</svg>
