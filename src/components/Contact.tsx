@@ -1,15 +1,36 @@
-import { useState, type FormEvent } from 'react'
+import { useEffect, useState, type FormEvent } from 'react'
 import { profile } from '../data/content'
 
 const YEAR = new Date().getFullYear()
-// empty in dev (Vite proxies /api); set VITE_API_URL to your deployed API when you publish the site
-const API = import.meta.env.VITE_API_URL ?? ''
+// empty in dev (Vite proxies /api); set VITE_API_URL to your deployed API when you publish the site.
+// A trailing slash would turn the request into "//api/contact", so it is stripped.
+const API = String(import.meta.env.VITE_API_URL ?? '')
+  .trim()
+  .replace(/\/+$/, '')
 
 type Status = { kind: 'idle' } | { kind: 'sending' } | { kind: 'ok' } | { kind: 'error'; message: string }
 
 export default function Contact() {
   const [status, setStatus] = useState<Status>({ kind: 'idle' })
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
+  const [slow, setSlow] = useState(false)
+  const sending = status.kind === 'sending'
+
+  // Free hosts put the API to sleep when idle. Pinging it as soon as the page opens
+  // wakes it in the background, so it is usually ready by the time someone sends a message.
+  useEffect(() => {
+    if (API) fetch(`${API}/api/health`).catch(() => {})
+  }, [])
+
+  // if sending takes more than a few seconds, tell the visitor why instead of leaving a silent spinner
+  useEffect(() => {
+    if (!sending) return
+    const t = window.setTimeout(() => setSlow(true), 5000)
+    return () => {
+      window.clearTimeout(t)
+      setSlow(false)
+    }
+  }, [sending])
 
   const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -22,6 +43,7 @@ export default function Contact() {
       const res = await fetch(`${API}/api/contact`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        signal: AbortSignal.timeout(75_000),
         body: JSON.stringify({
           name: f.get('name'),
           email: f.get('email'),
@@ -41,8 +63,6 @@ export default function Contact() {
       setStatus({ kind: 'error', message: `Could not reach the server. Please email me at ${profile.email}.` })
     }
   }
-
-  const sending = status.kind === 'sending'
 
   return (
     <section id="contact" className="relative px-5 pb-6 pt-28">
@@ -106,6 +126,11 @@ export default function Contact() {
           </button>
 
           <div role="status" aria-live="polite" className="mt-3 min-h-5 text-xs">
+            {sending && slow && (
+              <p className="text-[color:var(--muted)]">
+                The server was asleep and is waking up. This can take up to a minute the first time, please keep this page open.
+              </p>
+            )}
             {status.kind === 'ok' && (
               <p className="font-semibold text-emerald-400">Thanks! Your message is in my inbox. I'll reply soon.</p>
             )}

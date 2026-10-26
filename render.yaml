@@ -1,0 +1,27 @@
+# Render Blueprint for the contact API. The website itself is deployed on Vercel.
+# Secrets are marked "sync: false": Render asks for them in the dashboard and they never live in git.
+services:
+  - type: web
+    name: portfolio-api
+    runtime: node
+    plan: free
+    region: singapore
+    # only the 4 server packages are production dependencies, so this installs in seconds
+    buildCommand: npm ci --omit=dev
+    startCommand: node server/index.mjs
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: TRUST_PROXY
+        value: "1"
+      - key: MONGODB_DB
+        value: portfolio
+      - key: MONGODB_URI
+        sync: false
+      - key: RESEND_API_KEY
+        sync: false
+      - key: MAIL_TO
+        sync: false
+      - key: ALLOWED_ORIGIN
+        sync: false
