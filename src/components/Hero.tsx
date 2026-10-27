@@ -59,8 +59,8 @@ export default function Hero() {
       <div className="absolute inset-x-0 top-0 h-screen px-6 sm:px-14 lg:px-24">
         <div className="flex h-full items-center pt-10">
           <div className="max-w-2xl">
-            <h1 className="font-display text-5xl uppercase leading-[0.95] text-white sm:text-7xl lg:text-8xl">
-              Hello I am
+            <h1 className="font-display text-5xl  leading-[0.95] text-white sm:text-7xl lg:text-8xl">
+              Hi I am
               <span className="mt-3 block min-h-[1.1em] normal-case text-[color:var(--accent)]">
                 <Typewriter words={profile.roles} />
               </span>
