@@ -27,5 +27,7 @@ dist-ssr
 .env
 .env.*
 !.env.example
+# public build settings only (the API URL). Never put secrets in this file.
+!.env.production
 server/.env
 !server/.env.example

@@ -11,6 +11,7 @@
     "build": "tsc -b && vite build",
     "lint": "oxlint",
     "preview": "vite preview",
+    "start": "node server/index.mjs",
     "server": "node --env-file-if-exists=server/.env server/index.mjs",
     "dev:all": "concurrently -n web,api -c magenta,cyan \"npm:dev\" \"npm:server\""
   },
